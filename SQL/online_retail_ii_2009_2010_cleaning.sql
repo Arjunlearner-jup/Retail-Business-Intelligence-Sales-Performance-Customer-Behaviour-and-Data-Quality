@@ -1,13 +1,3 @@
--- Cleaning and profiling queries for:
---   ucitwo.online_retail_ii_2009_2010
---
--- These queries do not modify the source table. The view in section 3 is
--- created/replaced in schema ucitwo. Run sections in order, reviewing the
--- profiling results before deciding whether any rows should be excluded.
-
--- 1. Baseline data quality profile.
--- The known dataset has 525,461 rows. This reports null/blank fields and
--- transaction types that need an explicit analysis decision.
 SELECT
     COUNT(*) AS total_rows,
     SUM(Invoice IS NULL OR TRIM(Invoice) = '') AS missing_invoice,
@@ -25,7 +15,6 @@ SELECT
 FROM ucitwo.online_retail_ii_2009_2010;
 
 -- 2. Check date strings can be parsed using the dataset's m/d/yyyy h:mm format.
--- Investigate any rows returned before relying on parsed dates.
 SELECT InvoiceDate
 FROM ucitwo.online_retail_ii_2009_2010
 WHERE InvoiceDate IS NOT NULL
@@ -35,8 +24,6 @@ GROUP BY InvoiceDate
 ORDER BY InvoiceDate;
 
 -- 3. Create a cleaned view without changing or deleting source rows.
--- Trims text, turns empty strings into NULL, and parses InvoiceDate.
--- Missing customer IDs, returns/cancellations, and numeric extremes are kept.
 CREATE OR REPLACE VIEW ucitwo.online_retail_ii_2009_2010_clean AS
 SELECT
     NULLIF(TRIM(Invoice), '') AS Invoice,
